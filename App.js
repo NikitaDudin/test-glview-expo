@@ -4,6 +4,38 @@ import { Image, Slider, StyleSheet, Text, View } from 'react-native'
 
 import exampleImage from './assets/funny-cat.jpg'
 
+import md5 from './md5'
+
+const remoteAssetCache = {}
+
+const downloadRemoteAssetAsync = uri => {
+  const i = uri.lastIndexOf('.')
+  const ext = i !== -1 ? uri.slice(i) : '.jpg'
+  const key = md5(uri)
+
+  if (key in remoteAssetCache) {
+    return Promise.resolve(remoteAssetCache[key])
+  }
+
+  const promise = Promise.all([
+    new Promise((success, failure) =>
+      Image.getSize(uri, (width, height) => success({ width, height }), failure)
+    ),
+
+    FileSystem.downloadAsync(
+      uri,
+      FileSystem.documentDirectory + `ExponentAsset-${key}${ext}`,
+      {
+        cache: true,
+      }
+    ),
+  ]).then(([size, asset]) => ({ ...size, uri, localUri: asset.uri }))
+
+  remoteAssetCache[key] = promise
+
+  return promise
+}
+
 const vertShaderSource = `#version 300 es
 precision mediump float;
 
@@ -88,8 +120,12 @@ const glPromise = GLView.createContextAsync().then(async gl => {
   gl.vertexAttribPointer(positionAttrib, 2, gl.FLOAT, false, 0, 0)
 
   // download an asset
-  const asset = Asset.fromModule(exampleImage)
-  await asset.downloadAsync()
+  // const asset = Asset.fromModule(exampleImage)
+  // await asset.downloadAsync()
+
+  const asset = await downloadRemoteAssetAsync(
+    'https://i.ytimg.com/vi/dGFSjKuJfrI/maxresdefault.jpg'
+  )
 
   console.info('asset : ', asset)
 

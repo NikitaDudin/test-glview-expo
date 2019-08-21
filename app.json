@@ -4,8 +4,8 @@
     "description": "This project is really great.",
     "slug": "test-glview-expo",
     "privacy": "public",
-    "sdkVersion": "31.0.0",
-    "platforms": ["ios", "android"],
+    "sdkVersion": "34.0.0",
+    "platforms": ["ios", "android", "web"],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,21 +14,17 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "assets/**"
-    ],
+    "assetBundlePatterns": ["assets/**"],
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "versionCode": 100,
       "package": "test.glview.expo"
-    },
+    }
   }
 }

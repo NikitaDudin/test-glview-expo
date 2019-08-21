@@ -1,35 +1,31 @@
 import React from 'react'
-import { Asset, FileSystem, GLView } from 'expo'
+import * as GL from 'expo-gl'
+import { GLView } from 'expo-gl'
+import * as FileSystem from 'expo-file-system'
+import { Asset } from 'expo-asset'
 import { Image, Slider, StyleSheet, Text, View } from 'react-native'
 
 import exampleImage from './assets/funny-cat.jpg'
 
 const vertShaderSource = `#version 300 es
 precision mediump float;
-
 in vec2 position;
 out vec2 textureCoord;
-
 void main() {
   vec2 clipSpace = (1.0 - 2.0 * position) * vec2(-1.0, -1.0);
-
   textureCoord = position;
   gl_Position = vec4(clipSpace, 0.0, 1.0);
 }`
 
 const fragShaderSource = `#version 300 es
 precision mediump float;
-
 uniform sampler2D inputImageTexture;
 uniform float contrast;
-
 in vec2 textureCoord;
 out vec4 fragColor;
-
 void main() {
   vec4 textureColor = texture(inputImageTexture, textureCoord);
   vec3 rgb = (textureColor.rgb - vec3(0.5)) * contrast + vec3(0.5);
-
   fragColor = vec4(rgb, textureColor.a);
 }`
 
@@ -139,6 +135,7 @@ const glPromise = GLView.createContextAsync().then(async gl => {
   gl.uniform1i(gl.getUniformLocation(program, 'inputImageTexture'), 1)
 
   gl.clearColor(0, 0, 0, 1)
+  // tslint:disable-next-line: no-bitwise
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   return gl
@@ -202,7 +199,6 @@ export default class GLHeadlessRenderingScreen extends React.PureComponent {
           headless context that sits on top of the app and can be reused in
           multiple components without redundant shader recompilations.
         </Text>
-
         <View style={styles.flex}>
           {snapshot && (
             <Image
@@ -213,11 +209,10 @@ export default class GLHeadlessRenderingScreen extends React.PureComponent {
             />
           )}
         </View>
-
-        <Text style={styles.sliderHeader}>
-          Contrast: {parseInt(contrast * 100, 10)}%
-        </Text>
-
+        <Text style={styles.sliderHeader}>{`Contrast: ${parseInt(
+          String(contrast * 100),
+          10
+        )}%`}</Text>
         <Slider
           value={contrast}
           step={0.01}
